@@ -1,0 +1,18 @@
+源码初探
+1 父项目
+<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.1.RELEASE</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+  
+  父项目的父项目
+  <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-dependencies</artifactId>
+        <version>2.1.1.RELEASE</version>
+        <relativePath>../../spring-boot-dependencies</relativePath>
+    </parent>
+    
+    此父项目管理spring-boot项目中的所依赖的所有的版本，可以叫做版本中的仲裁中心，之后导入的项目不需要版本号，使用默认版本号。
