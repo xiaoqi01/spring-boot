@@ -1,0 +1,127 @@
+配置文件
+  编写JavaBean
+  /** 
+ * 将配置文件中的配置的每一个属性值，映射到组件中 
+ * @ConfigurationProperties: 告诉SpringBoot将本类中的所有属性和配置文件中相关的配置进行绑定。 
+ *      prefix: 配置文件中的prefix指定的属性下的所有属性与该组件属性一一对应。 
+ * 
+ * @ConfigurationProperties: 默认从全局配置文件中获取值 
+ * 
+ * 只有这个组件是容器中的组件，容器才能提供@ConfigurationProperties功能。 
+ */  
+@Component  
+@ConfigurationProperties(prefix = "person")  
+public class Person implements Serializable {  
+
+    private String name;  
+    private Integer age;  
+    private Boolean boss;  
+    private Date birth;  
+
+    private Map<String, Object> maps;  
+    private List<Object> lists;  
+
+    private Dog dog;  
+
+    //省略getter和setter  
+}
+
+可以导入配置文件处理器，然后配置属性的时候就会有提示
+<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+ </dependency>
+ 
+ 编写配置文件
+ resource文件夹中新建application.yml
+ 格式：
+ 
+YAML使用缩进表示层级关系，缩进时不允许使用Tab键，只允许使用空格。缩进的空格的数目不重要，只要相同层级的元素左侧对齐即可。
+
+YAML支持三种数据结构 ：
+
+对象 ： 键值对的集合；
+数组 ： 一组按次序排列的值；
+字面量 ： 单个的不可分割的值。
+语法格式如下 ：
+ 配置例子-更改Tomcat默认端口 ：
+  server:
+  port:8081
+  对象写法：
+  person:
+   age: 18
+   name:(此处有空格) 张三
+  
+ 值写法
+ 一般值有三种类型 ： 字面量,即普通的值(数字，字符串，布尔)；对象、map(键值对)；数组(list set)。
+  字面量
+  k: v：字面直接来写；
+  字符串默认不用加上单引号或者双引号；
+  “”：双引号；不会转义字符串里面的特殊字符；特殊字符会作为本身想表示的意思
+   name: "zhangsan \n lisi"；输出:zhangsan 换行 lisi;
+  ”：单引号；会转义特殊字符，特殊字符最终只是一个普通的字符串数据
+  name: ‘zhangsan \n lisi’; 输出:zhangsan \n lisi
+  
+  对象、map
+    k: v：在下一行来写对象的属性和值的关系；注意缩进 
+    对象还是k: v的方式
+    person:
+     age: 18
+     name: zhangsan
+     行内写法
+      friends: {lastName: zhangsan,age: 18}
+      person: {name: 王五,age: 18}
+   数组
+    用- 值表示数组中的一个元素
+    pets:
+      ‐ cat
+      ‐ dog
+      ‐ pig
+      
+     行内写法
+     pets: [cat,dog,pig]
+     
+@Value和@ConfigurationProperties获取值的区别
+
+@ConfigurationProperties	@Value
+功能	批量注入配置文件中的	一个一个指定
+松散绑定	支持松散绑定	不支持松散绑定
+SpEL	不支持	支持
+JSR303数据校验	支持，@Validated、@Email等	不支持
+复杂类型封装	支持	不支持
+
+@PropertySource
+
+用于读取application.properties之外的properties文件
+写法：@PropertySource(value = {"classpath:person.properties"})
+单独使用时获取值时需要在属性上使用@Value
+该注解需要配合@ConfigurationProperties一起使用
+在需要注入的类中通过@PropertySource进行导入该配置文件，然后使用@ConfigurationProperties注解标注使用的属性前缀：
+@PropertySource(value = {"classpath:person.properties"})
+@Component
+@ConfigurationProperties(prefix = "person")
+需要在@ConfigurationProperties中指定使用的前缀prefix(如果有)
+需要在@PropertySource指定加载的properties文件
+
+@ImportResource
+导入spring的配置文件，让配置文件里面的内容生效。
+SpringBoot里面没有Spring的配置文件，即使用Spring项目中的xml格式的配置文件，SpringBoot不能自动识别，如果想让Spring的配置文件生效，需要使用@ImportResource标注在一个配置类上，推荐标注在主配置类上。
+
+
+@Bean
+
+SpringBoot推荐给容器中添加组件的方式：使用注解 @Bean
+
+/** 
+ * @Configuration: 指明当前类是一个注解类，用来代替原来的Spring的xml配置文件 
+ */  
+@Configuration  
+public class MyConfig {  
+
+    //将方法的返回值添加到容器中，容器中这个组件默认的id为方法名  
+    @Bean  
+    public HelloService helloService(){  
+        System.out.println("添加组件：helloService");  
+        return new HelloService();  
+    }  
+}  
